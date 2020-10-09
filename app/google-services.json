@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "74179272056",
+    "firebase_url": "https://ifind-803ce.firebaseio.com",
+    "project_id": "ifind-803ce",
+    "storage_bucket": "ifind-803ce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74179272056:android:2273e9f78f8e6622d2fc8d",
+        "android_client_info": {
+          "package_name": "com.example.ifind"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "74179272056-plgdi1l74bqral4cpbii691gbvddukmb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ifind",
+            "certificate_hash": "3dadf40d7d7482706f860460ec5569761fdd89af"
+          }
+        },
+        {
+          "client_id": "74179272056-tsf8kbgc9gu9kcmj5hnv5cjn3pr4os7t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCp2hC3UdLtel8cvfXpX3bEHlpEr3Cpocw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "74179272056-tsf8kbgc9gu9kcmj5hnv5cjn3pr4os7t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
