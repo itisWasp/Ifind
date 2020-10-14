@@ -1,6 +1,8 @@
 package com.example.ifind.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ifind.ChatActivity;
 import com.example.ifind.R;
+import com.example.ifind.ThereProfileActivity;
 import com.example.ifind.models.ModelUser;
 import com.squareup.picasso.Picasso;
 
@@ -64,17 +67,36 @@ public class AdapterUsers extends RecyclerView.Adapter<AdapterUsers.MyHolder> {
         }
 
         //handle item click
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*Click user from user list to start chatting/messaging
-                * start activity by putting uid of receiver
-                * we will use that uid to identify the user we are gonna chat
-                 */
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("hisUid", hisUID);
-                context.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(view -> {
+            //show dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setItems(new String[]{"Profile", "Chat"}, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (i==0){
+                        //profile clicked
+                        /*Click user from user list to start chatting/messaging
+                         * start activity by putting uid of receiver
+                         * we will use that uid to identify the user we are gonna chat
+                         */
+                        Intent intent = new Intent(context, ThereProfileActivity.class);
+                        intent.putExtra("uid", hisUID);
+                        context.startActivity(intent);
+                    }
+                    if (i==1){
+                        //chat clicked
+                        /*Click user from user list to start chatting/messaging
+                         * start activity by putting uid of receiver
+                         * we will use that uid to identify the user we are gonna chat
+                         */
+                        Intent intent = new Intent(context, ChatActivity.class);
+                        intent.putExtra("hisUid", hisUID);
+                        context.startActivity(intent);
+                    }
+                }
+            });
+            builder.create().show();
+
         });
 
     }

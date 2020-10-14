@@ -55,7 +55,7 @@ public class DashboardActivity extends AppCompatActivity {
         checkUserStatus();
 
         //update token
-            updateToken(FirebaseInstanceId.getInstance().getToken());
+            //updateToken(FirebaseInstanceId.getInstance().getToken());
 
     }
 
@@ -68,7 +68,7 @@ public class DashboardActivity extends AppCompatActivity {
     public void updateToken(String token){
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Tokens");
         Token mToken = new Token(token);
-        ref.child(mUID).setValue(mToken);
+        //ref.child(mUID).setValue(mToken);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener =
