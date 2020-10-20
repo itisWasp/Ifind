@@ -54,8 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         checkUserStatus();
 
-        //update token
-            //updateToken(FirebaseInstanceId.getInstance().getToken());
+
 
     }
 
@@ -68,7 +67,7 @@ public class DashboardActivity extends AppCompatActivity {
     public void updateToken(String token){
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Tokens");
         Token mToken = new Token(token);
-        //ref.child(mUID).setValue(mToken);
+        ref.child(mUID).setValue(mToken);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener =
@@ -129,6 +128,10 @@ public class DashboardActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sp.edit();
             editor.putString("Current_USERID", mUID);
             editor.apply();
+
+            //update token
+            updateToken(FirebaseInstanceId.getInstance().getToken());
+
         }
         else {
             //user not signed in, go to main activity
