@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PostDetailActivity"></activity>
+        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".PostDetailActivity" />
         <activity android:name=".ThereProfileActivity" />
         <activity android:name=".AddPostActivity" />
         <activity
@@ -32,14 +33,6 @@
         <activity android:name=".MainActivity" />
 
         <service
-            android:name=".notifications.FirebaseService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_SERVICE" />
-            </intent-filter>
-        </service>
-        <service
             android:name=".notifications.FirebaseMessaging"
             android:enabled="true"
             android:exported="true">
@@ -47,24 +40,24 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="android.permission.EXPAND_STATUS_BAR" />
             </intent-filter>
-        </service>
-
-        <!--define file provider-->
-        <!--Set the android:exported attribute to false;
-        the FileProvider does not need to be public-->
-        <!--Set the android:grantUriPermissions attribute to true,
-        to allow you to grant temporary access to files.-->
-        
+        </service> <!-- define file provider -->
+        <!--
+Set the android:exported attribute to false;
+        the FileProvider does not need to be public
+        -->
+        <!--
+Set the android:grantUriPermissions attribute to true,
+        to allow you to grant temporary access to files.
+        -->
         <provider
-            android:authorities="com.example.ifind.fileprovider"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.ifind.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/paths"/>
+                android:resource="@xml/paths" />
         </provider>
-
     </application>
 
 </manifest>

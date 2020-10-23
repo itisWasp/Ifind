@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -44,8 +50,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 public class AddPostActivity extends AppCompatActivity {
 
@@ -471,31 +481,37 @@ public class AddPostActivity extends AppCompatActivity {
                                 hashMap.put("pDescr", description);
                                 hashMap.put("pImage", downloadUri);
                                 hashMap.put("pTime", timeStamp);
+                                hashMap.put("pLikes", "0");
+                                hashMap.put("pComments", "0");
 
                                 //path to store post data
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
                                 //put data in this ref
                                 ref.child(timeStamp).setValue(hashMap)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                //added in database
-                                                pd.dismiss();
-                                                Toast.makeText(AddPostActivity.this, "Post published", Toast.LENGTH_SHORT).show();
-                                                //reset views
-                                                titleEt.setText("");
-                                                descriptionEt.setText("");
-                                                imageIv.setImageURI(null);
-                                                image_rui = null;
-                                            }
+                                        .addOnSuccessListener(aVoid -> {
+                                            //added in database
+                                            pd.dismiss();
+                                            Toast.makeText(AddPostActivity.this, "Post published", Toast.LENGTH_SHORT).show();
+                                            //reset views
+                                            titleEt.setText("");
+                                            descriptionEt.setText("");
+                                            imageIv.setImageURI(null);
+                                            image_rui = null;
+
+                                            //send notification
+                                            prepareNotification(
+                                                    ""+timeStamp,
+                                                    ""+name+" added new post",
+                                                    ""+title+"\n"+description,
+                                                    "PostNotification",
+                                                    "POST"
+                                            );
+
                                         })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                //failed adding post in database
-                                                pd.dismiss();
-                                                Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
+                                        .addOnFailureListener(e -> {
+                                            //failed adding post in database
+                                            pd.dismiss();
+                                            Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                                         });
                             }
                         }
@@ -523,6 +539,8 @@ public class AddPostActivity extends AppCompatActivity {
             hashMap.put("pDescr", description);
             hashMap.put("pImage", "noImage");
             hashMap.put("pTime", timeStamp);
+            hashMap.put("pLikes", "0");
+            hashMap.put("pComments", "0");
 
             //path to store post data
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
@@ -539,6 +557,16 @@ public class AddPostActivity extends AppCompatActivity {
                             descriptionEt.setText("");
                             imageIv.setImageURI(null);
                             image_rui = null;
+
+                            //send notification
+                            prepareNotification(
+                                    ""+timeStamp,
+                                    ""+name+" added new post",
+                                    ""+title+"\n"+description,
+                                    "PostNotification",
+                                    "POST"
+                            );
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -551,6 +579,70 @@ public class AddPostActivity extends AppCompatActivity {
                     });
 
         }
+    }
+
+    private void prepareNotification(String pId, String title, String description, String notificationType, String notificationTopic){
+        //prepare data for notification
+
+        String NOTIFICATION_TOPIC = "/topics/" + notificationTopic; //topic must match with what the receiver subscribed to
+        String NOTIFICATION_TITLE = title; //e.g ISrael Added new post
+        String NOTIFICATION_MESSAGE = description; //content of post
+        String NOTIFICATION_TYPE = notificationType; //now there are two notification types chat & post, so to differentiate in FirebaseMessaging.java class
+
+        //prepare json what to send and where to send
+        JSONObject notificationJo = new JSONObject();
+        JSONObject notificationBodyJo = new JSONObject();
+
+        try {
+            //what to send
+            notificationBodyJo.put("notificationType", NOTIFICATION_TYPE);
+            notificationBodyJo.put("sender", uid); // uid of current user/sender
+            notificationBodyJo.put("pId", pId); //post id
+            notificationBodyJo.put("pTitle", NOTIFICATION_TITLE);
+            notificationBodyJo.put("pDescription", NOTIFICATION_MESSAGE);
+            //where to send
+            notificationJo.put("to", NOTIFICATION_TOPIC);
+
+            notificationJo.put("data", notificationBodyJo); //combine data to be sent
+
+        } catch (JSONException e) {
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        sendPostNotification(notificationJo);
+
+    }
+
+    private void sendPostNotification(JSONObject notificationJo) {
+        //send volley object request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", notificationJo,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //Log.d("FCM_RESPONSE", "onResponse: "+response.toString());
+                        Log.d("FCM_RESPONSE", "onResponse: "+response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //error occured
+                        Toast.makeText(AddPostActivity.this, ""+error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+        {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                //put required headers
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=AAAAEUVt3Xg:APA91bEHSHc8S4paNZ8vDvsMdRxQGO19HW9WDNsJgDqtoXxJwKRv80zXzTF38Sx0z6kQAVAbTuJTihkwUR-YmHrs9XY-ynC5OAORMR914xni6aYuNptqE_PXnJyVVO_g8V8E4a5vZkrw"); //
+                return headers;
+            }
+        };
+        //enqueque the volley request
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
     }
 
     private void showImagePickDialog() {
@@ -695,8 +787,6 @@ public class AddPostActivity extends AppCompatActivity {
     }
 
     //handle permission results
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

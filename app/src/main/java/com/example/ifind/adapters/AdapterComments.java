@@ -121,11 +121,11 @@ public class AdapterComments extends RecyclerView.Adapter<AdapterComments.MyHold
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //ref.child("pComments").equals(0);
-                //String comments = ""+snapshot.child("pComments").getValue();
-                int comments = 0;
-                int newCommentVal = comments - 1;
-                //int newCommentVal = Integer.parseInt(comments)-1;
+                ref.child("pComments");
+                String comments = ""+snapshot.child("pComments").getValue();
+                //int comments = 0;
+                //int newCommentVal = comments - 1;
+                int newCommentVal = Integer.parseInt(comments)-1;
                 ref.child("pComments").setValue(""+newCommentVal);
             }
 

@@ -177,7 +177,16 @@ public class ChatListFragment extends Fragment {
                             chat.getSender().equals(userId) ||
                     chat.getReceiver().equals(userId) &&
                     chat.getSender().equals(currentUser.getUid())){
-                        theLastMessage = chat.getMessage();
+                        //instead of displaying url in message show "sent photo"
+                        if (
+                                "image".equals(chat.getType())
+                        //        chat.getType().equals("image")
+                        ){
+                            theLastMessage = "Sent a photo";
+                        }
+                        else {
+                            theLastMessage = chat.getMessage();
+                        }
 
                     }
                 }
@@ -231,6 +240,11 @@ public class ChatListFragment extends Fragment {
             firebaseAuth.signOut();
             checkUserStatus();
         }
+        else if (id==R.id.action_settings){
+            //go to settings activity
+            startActivity(new Intent(getActivity(), SettingsActivity.class));
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

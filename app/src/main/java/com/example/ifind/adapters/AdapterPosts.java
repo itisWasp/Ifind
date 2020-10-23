@@ -149,8 +149,8 @@ public class AdapterPosts extends RecyclerView.Adapter<AdapterPosts.MyHolder>{
         myHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                long pLikes = 0;
-                //int pLikes = Integer.parseInt(postList.get(i).getpLikes());
+                //long pLikes = 0;
+                int pLikes = Integer.parseInt(postList.get(i).getpLikes());
                 mProcessLike = true;
                 //get id of the post clicked
                 final String postIde = postList.get(i).getpId();

@@ -29,7 +29,18 @@
             android:padding="15dp"
             android:text="His Message"
             android:layout_width="wrap_content"
+            android:visibility="gone"
             android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/messageIv"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:adjustViewBounds="true"
+            android:padding="15sp"
+            android:src="@drawable/ic_image_black"
+            android:scaleType="fitCenter"
+            android:background="@drawable/bg_receiver"/>
 
         <TextView
             android:id="@+id/timeTv"
