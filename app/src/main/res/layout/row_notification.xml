@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/colorWhite"
     app:cardUseCompatPadding="true"
     app:cardCornerRadius="2dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/colorWhite"
     app:contentPadding="3dp">
 
     <LinearLayout
@@ -15,13 +15,12 @@
         android:orientation="horizontal">
 
         <com.blogspot.atifsoftwares.circularimageview.CircularImageView
-            android:id="@+id/avatarIv"
-            android:src="@drawable/ic_default_img"
             android:layout_width="70dp"
-            android:layout_height="70dp"/>
+            android:layout_height="70dp"
+            android:id="@+id/avatarIv"
+            android:src="@drawable/ic_default_img"/>
 
         <LinearLayout
-            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -30,25 +29,26 @@
                 android:id="@+id/nameTv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Person Name"
+                android:text="Name"
                 android:textSize="18sp"
+                android:textStyle="bold"
                 android:textColor="@color/colorBlack"/>
+
             <TextView
-                android:id="@+id/emailTv"
+                android:id="@+id/notificationTv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Person Email"
+                android:text="Notification"
+                android:textColor="@color/colorBlack"/>
+
+            <TextView
+                android:id="@+id/timeTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Time"
                 android:textColor="@color/colorBlack"/>
 
         </LinearLayout>
-
-        <!--Add icons to indicate blocked/unblocked-->
-        <ImageView
-            android:id="@+id/blockIv"
-            android:layout_gravity="center_vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_unblocked_green"/>
 
     </LinearLayout>
 

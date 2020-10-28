@@ -12,6 +12,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -40,6 +41,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -365,49 +368,130 @@ public class ProfileFragment extends Fragment {
         * 2) Edit Cover Photo
         * 3) EDit Name
         * 4) Edit Phone
+        * 5) Change Passwords
          */
 
         //options to show in dialog
-        String options[] = {"Edit Profile Picture", "Edit Cover Photo", "Edit Name", "Edit Phone"};
+        String options[] = {"Edit Profile Picture", "Edit Cover Photo", "Edit Name", "Edit Phone", "Change Password"};
         //alert dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         //set Title
         builder.setTitle("Choose Action");
         //set items to dialog
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //handle dialog item clicks
-                if (i == 0){
-                    //Edit Profile clicked
-                    pd.setMessage("Updating Profile Picture");
-                    profileOrCoverPhoto = "image"; //i.e changing profile picture, maje sure to assign same value
-                    showImagePicDialog();
-                }
-                else if (i == 1){
-                    //Edit Cover clicked
-                    pd.setMessage("Updating Cover Photo");
-                    profileOrCoverPhoto = "cover"; //i.e changing profile picture, maje sure to assign same value
-                    showImagePicDialog();
+        builder.setItems(options, (dialogInterface, i) -> {
+            //handle dialog item clicks
+            if (i == 0){
+                //Edit Profile clicked
+                pd.setMessage("Updating Profile Picture");
+                profileOrCoverPhoto = "image"; //i.e changing profile picture, maje sure to assign same value
+                showImagePicDialog();
+            }
+            else if (i == 1){
+                //Edit Cover clicked
+                pd.setMessage("Updating Cover Photo");
+                profileOrCoverPhoto = "cover"; //i.e changing profile picture, maje sure to assign same value
+                showImagePicDialog();
 
-                }
-                else if (i ==2){
-                    //Edit Name clicked
-                    pd.setMessage("Updating Name");
-                    //calling method and pass key "name" as parameter to update it's value in database
-                    showNamePhoneUpdateDialog("name");
+            }
+            else if (i ==2){
+                //Edit Name clicked
+                pd.setMessage("Updating Name");
+                //calling method and pass key "name" as parameter to update it's value in database
+                showNamePhoneUpdateDialog("name");
 
-                }
-                else if (i == 3){
-                    //Edit Phone clicked
-                    pd.setMessage("Updating Phone");
-                    showNamePhoneUpdateDialog("phone");
-
-                }
+            }
+            else if (i == 3){
+                //Edit Phone clicked
+                pd.setMessage("Updating Phone");
+                showNamePhoneUpdateDialog("phone");
+            }
+            else if (i == 4){
+                //Edit Phone clicked
+                pd.setMessage("Changing Password");
+                showChangePasswordDialog();
             }
         });
         //create and show dialog
         builder.create().show();
+    }
+
+    private void showChangePasswordDialog() {
+        //password change with custom layout having currentPassword, newPassword and update button
+
+        //inflate layout for dialog
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_update_password, null);
+        EditText passwordEt = view.findViewById(R.id.passwordEt);
+        EditText newPasswordEt = view.findViewById(R.id.newPasswordEt);
+        AppCompatButton updatePasswordBtn  = view.findViewById(R.id.updatePasswordBtn);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(view); //set view to dialog
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        updatePasswordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //validate data
+                String oldPassword = passwordEt.getText().toString().trim();
+                String newPassword = newPasswordEt.getText().toString().trim();
+                if (TextUtils.isEmpty(oldPassword)){
+                    Toast.makeText(getActivity(), "Enter your current password...", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (newPassword.length()<6){
+                    Toast.makeText(getActivity(), "Password length at least 6 characters...", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                dialog.dismiss();
+                updatePassword(oldPassword, newPassword);
+            }
+        });
+
+    }
+
+    private void updatePassword(String oldPassword, String newPassword) {
+        pd.show();
+        //get current user
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        //before changing password re-authenticate the user
+        AuthCredential authCredential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
+        user.reauthenticate(authCredential)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        //successfully authenticated, begin update
+
+                        user.updatePassword(newPassword)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //password updated
+                                        pd.dismiss();
+                                        Toast.makeText(getActivity(), "Password Updated...", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        //failed updating password, show reason
+                                        pd.dismiss();
+                                        Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        //authentication failed, show reason
+                        pd.dismiss();
+                        Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void showNamePhoneUpdateDialog(final String key) {

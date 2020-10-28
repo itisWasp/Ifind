@@ -11,13 +11,34 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".MyApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".SettingsActivity"></activity>
         <activity android:name=".PostDetailActivity" />
         <activity android:name=".ThereProfileActivity" />
-        <activity android:name=".AddPostActivity" />
+
+        <!--Intent filters inform the System what intents an  applocation component is willing to accept,
+        To receive text/image type of intents we will add intent filter to activity, that will handle that data-->
+
+        <activity android:name=".AddPostActivity" >
+
+            <intent-filter>
+                <!--For Image-->
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+            </intent-filter>
+
+            <intent-filter>
+                <!--For Text-->
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppThemeNo" />

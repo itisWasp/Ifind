@@ -13,6 +13,12 @@
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/colorPrimaryDark"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
         <!--Receiver profile picture-->
         <com.blogspot.atifsoftwares.circularimageview.CircularImageView
             android:id="@+id/profileIv"
@@ -23,7 +29,8 @@
             app:c_background_color="@color/colorPrimaryDark"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginStart="20dp"
@@ -47,8 +54,20 @@
                 android:layout_height="wrap_content"
                 android:text="Online"
                 android:textColor="@color/colorWhite"
-                android:textSize="18sp"
+                android:textSize="10sp"
                 android:textStyle="bold|italic"/>
+
+        </LinearLayout>
+
+            <!--Add icons to indicate blocked/unblocked-->
+            <ImageView
+                android:layout_marginEnd="5dp"
+                android:id="@+id/blockIv"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_unblocked_green"
+                android:layout_marginRight="5dp" />
 
         </LinearLayout>
 
